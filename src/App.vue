@@ -46,7 +46,8 @@ const storySlides = ref([
     layout: 'layout-full-image', // Gambar background full, teks di atasnya
     background: 'linear-gradient(135deg, #1f1c2c, #928DAB)',
     shape: 'circle',
-    audioSrc: audioNobodyElse // Lagu pembuka santai
+    audioSrc: audioNobodyElse, // Lagu pembuka santai
+    musicLabel: 'LANY • Nobody Else'
   },
   {
     type: 'slide-base',
@@ -56,7 +57,8 @@ const storySlides = ref([
     layout: 'layout-reverse', // Teks di atas, gambar di bawah
     background: 'linear-gradient(135deg, #232526, #414345)',
     shape: 'blob',
-    audioSrc: audioChachacha // Lagu ceria
+    audioSrc: audioChachacha, // Lagu ceria
+    musicLabel: 'Bruno Mars • Cha Cha Cha'
   },
   {
     type: 'slide-base',
@@ -66,7 +68,8 @@ const storySlides = ref([
     layout: 'layout-split', // Teks terpisah jarak jauh dari gambar
     background: 'linear-gradient(135deg, #141E30, #243B55)',
     shape: 'circle',
-    audioSrc: audioKitaBuatMenyenangkan // Cocok untuk perjalanan ceria/Dufan
+    audioSrc: audioKitaBuatMenyenangkan, // Cocok untuk perjalanan ceria/Dufan
+    musicLabel: 'Bernadya • Kita Buat Menyenangkan'
   },
   {
     type: 'slide-base',
@@ -76,7 +79,8 @@ const storySlides = ref([
     layout: 'layout-split', // Grid layout
     background: 'linear-gradient(135deg, #5a3a3a, #e29595)',
     shape: 'circle',
-    audioSrc: audioMemoriBaik // Lagu kenangan konser
+    audioSrc: audioMemoriBaik, // Lagu kenangan konser
+    musicLabel: 'Sheila On 7 • Memori Baik (feat. Aishameglio)'
   },
   {
     type: 'slide-base',
@@ -86,7 +90,8 @@ const storySlides = ref([
     layout: 'layout-split', // Ubah ke split agar grid bisa terlihat penuh di layar
     background: 'linear-gradient(135deg, #114357, #F29492)',
     shape: 'blob',
-    audioSrc: audioSwim // Nuansa adventure/alam
+    audioSrc: audioSwim, // Nuansa adventure/alam
+    musicLabel: 'BTS • Swim'
   },
   {
     type: 'slide-base',
@@ -97,12 +102,14 @@ const storySlides = ref([
     alignText: 'top',
     background: 'linear-gradient(135deg, #2b1055, #7597de)',
     shape: 'blob',
-    audioSrc: audioEverythingUAre // Lagu romantis untuk penutup
+    audioSrc: audioEverythingUAre, // Lagu romantis untuk penutup
+    musicLabel: 'Hindia • Everything U Are'
   },
   {
     type: 'slide-share',
     background: 'var(--color-bg-dark)',
-    audioSrc: audioEverythingUAre // Tetap lanjut lagu romantis di halaman share
+    audioSrc: audioEverythingUAre, // Tetap lanjut lagu romantis di halaman share
+    musicLabel: 'Hindia • Everything U Are'
   }
 ]);
 </script>
