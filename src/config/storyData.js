@@ -38,73 +38,73 @@ export const storySlides = ref([
     type: 'slide-base',
     title: 'Hey you.',
     message: 'I put together this little thing to look back at our random moments. Ready?',
-    image: imgFirstMeet, // 1 gambar
-    layout: 'layout-full-image', // Gambar background full, teks di atasnya
+    image: imgFirstMeet,
+    layout: 'layout-full-image',
     background: 'linear-gradient(135deg, #1f1c2c, #928DAB)',
     shape: 'circle',
-    audioSrc: audioNobodyElse, // Lagu pembuka santai
+    audioSrc: audioNobodyElse,
     musicLabel: 'LANY • Nobody Else'
   },
   {
     type: 'slide-base',
     title: 'Where it started',
     message: 'Still remember this? Started out as just a normal day, but it ended up changing everything for me.',
-    image: [imgFirstDate1, imgFirstDate2, imgFirstDate3, imgFirstDate4], // 4 gambar (Dynamic Stack)
-    layout: 'layout-reverse', // Teks di atas, gambar di bawah
+    image: [imgFirstDate1, imgFirstDate2, imgFirstDate3],
+    layout: 'layout-reverse',
     background: 'linear-gradient(135deg, #232526, #414345)',
     shape: 'blob',
-    audioSrc: audioChachacha, // Lagu ceria
+    audioSrc: audioChachacha,
     musicLabel: 'Bruno Mars • Cha Cha Cha'
   },
   {
     type: 'slide-base',
     title: 'Time flies',
     message: 'From awkward early dates to just acting silly together. It\u2019s been such a fun ride.',
-    image: [imgDufan1, imgDufan2, imgDufan3], // 3 gambar
-    layout: 'layout-split', // Teks terpisah jarak jauh dari gambar
+    image: [imgDufan1, imgDufan2, imgDufan3],
+    layout: 'layout-split',
     background: 'linear-gradient(135deg, #141E30, #243B55)',
     shape: 'circle',
-    audioSrc: audioKitaBuatMenyenangkan, // Cocok untuk perjalanan ceria/Dufan
+    audioSrc: audioKitaBuatMenyenangkan,
     musicLabel: 'Bernadya • Kita Buat Menyenangkan'
   },
   {
     type: 'slide-base',
     title: 'Concert nights',
     message: 'Screaming our lungs out to our favorite songs until we completely lost our voices. 🎤🎶',
-    image: [imgConcert1, imgConcert2, imgConcert3], // 3 gambar
-    layout: 'layout-split', // Grid layout
+    image: [imgConcert1, imgConcert2, imgConcert3],
+    layout: 'layout-split',
     background: 'linear-gradient(135deg, #5a3a3a, #e29595)',
     shape: 'circle',
-    audioSrc: audioMemoriBaik, // Lagu kenangan konser
+    audioSrc: audioMemoriBaik,
     musicLabel: 'Sheila On 7 • Memori Baik (feat. Aishameglio)'
   },
   {
     type: 'slide-base',
     title: 'My travel partner',
     message: 'From tiring hikes to getting sunburned at the beach... it\u2019s always a good time with you. 🌊⛰️',
-    image: [imgMountain1, imgTrekking2, imgBeach3, imgMountain2, imgTrekking1, imgBeach2], // 6 gambar (diacak agar lebih estetis)
-    layout: 'layout-split', // Ubah ke split agar grid bisa terlihat penuh di layar
+    image: [imgMountain1, imgTrekking2, imgBeach3, imgMountain2, imgTrekking1, imgBeach2],
+    layout: 'layout-split',
     background: 'linear-gradient(135deg, #114357, #F29492)',
     shape: 'blob',
-    audioSrc: audioSwim, // Nuansa adventure/alam
+    audioSrc: audioSwim,
     musicLabel: 'BTS • Swim'
   },
   {
     type: 'slide-base',
     title: 'Thank you',
     message: 'For staying, and for being the absolute best part of my days.<br/>I love you. \u2764\ufe0f',
-    image: imgThankYou, // 1 gambar
+    image: imgThankYou,
     layout: 'layout-full-image',
     alignText: 'top',
     background: 'linear-gradient(135deg, #2b1055, #7597de)',
     shape: 'blob',
-    audioSrc: audioEverythingUAre, // Lagu romantis untuk penutup
+    audioSrc: audioEverythingUAre,
     musicLabel: 'Hindia • Everything U Are'
   },
   {
     type: 'slide-share',
     background: 'var(--color-bg-dark)',
-    audioSrc: audioEverythingUAre, // Tetap lanjut lagu romantis di halaman share
+    audioSrc: audioEverythingUAre,
     musicLabel: 'Hindia • Everything U Are'
   }
 ]);
