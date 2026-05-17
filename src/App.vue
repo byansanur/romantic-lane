@@ -18,6 +18,8 @@ import audioEverythingUAre from './assets/audio/everything-u-are.mp3';
 import imgFirstMeet from './assets/image/first-meet.webp';
 import imgFirstDate1 from './assets/image/first-date1.webp';
 import imgFirstDate2 from './assets/image/first-date2.webp';
+import imgFirstDate3 from './assets/image/first-date3.jpeg';
+import imgFirstDate4 from './assets/image/first-date4.jpeg';
 import imgDufan1 from './assets/image/dufan-trip1.webp';
 import imgDufan2 from './assets/image/dufan-trip2.webp';
 import imgDufan3 from './assets/image/dufan-trip3.webp';
@@ -53,7 +55,7 @@ const storySlides = ref([
     type: 'slide-base',
     title: 'Where it started',
     message: 'Still remember this? Started out as just a normal day, but it ended up changing everything for me.',
-    image: [imgFirstDate1, imgFirstDate2], // 2 gambar
+    image: [imgFirstDate1, imgFirstDate2, imgFirstDate3, imgFirstDate4], // 4 gambar (Dynamic Stack)
     layout: 'layout-reverse', // Teks di atas, gambar di bawah
     background: 'linear-gradient(135deg, #232526, #414345)',
     shape: 'blob',
