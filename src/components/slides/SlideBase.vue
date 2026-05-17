@@ -19,35 +19,18 @@
     </div>
     
     <div class="content-wrapper" :class="[slideData.layout || 'layout-default', slideData.alignText === 'top' ? 'align-top' : '']">
-      <!-- Dynamic Stack Layout for > 2 images -->
-      <div class="collage-container stack-layout" v-if="slideData.layout === 'layout-reverse' && images.length > 2">
-        <div 
-          v-for="(img, index) in images" 
-          :key="index"
-          class="photo-container collage-item stack-card"
-          :style="getStackCardStyle(index)"
-        >
-          <img :src="img" alt="Memory" class="slide-photo" />
-        </div>
-      </div>
+      <!-- Card Stack (layout-reverse: 1, 2, or N>2 stacked photos) -->
+      <CardStack 
+        v-if="slideData.layout === 'layout-reverse' && images.length > 0" 
+        :images="images" 
+      />
 
-      <!-- CSS Swap Layout for exactly 2 images -->
-      <div class="collage-container count-2" v-else-if="slideData.layout === 'layout-reverse' && images.length === 2">
-        <div class="photo-container collage-item item-1"><img :src="images[0]" class="slide-photo" /></div>
-        <div class="photo-container collage-item item-2"><img :src="images[1]" class="slide-photo" /></div>
-      </div>
+      <!-- Photo Grid (layout-split: 3, 4, 6 grid photos) -->
+      <PhotoGrid 
+        v-else-if="images.length > 0 && slideData.layout !== 'layout-full-image'" 
+        :images="images" 
+      />
 
-      <!-- General Grid Layout -->
-      <div class="collage-container" :class="`count-${images.length}`" v-else-if="images.length > 0 && slideData.layout !== 'layout-full-image'">
-        <div 
-          v-for="(img, index) in images" 
-          :key="index"
-          class="photo-container collage-item"
-          :class="`item-${index + 1}`"
-        >
-          <img :src="img" alt="Memory" class="slide-photo" />
-        </div>
-      </div>
       <div class="emoji-container" v-if="slideData.emoji && !slideData.image">
         <span class="emoji">{{ slideData.emoji }}</span>
       </div>
@@ -59,7 +42,9 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
+import CardStack from '../collage/CardStack.vue';
+import PhotoGrid from '../collage/PhotoGrid.vue';
 
 const props = defineProps({
   slideData: {
@@ -77,56 +62,6 @@ const slideStyle = computed(() => {
   return {
     background: props.slideData.background || 'var(--color-bg-panel)'
   };
-});
-
-// Dynamic Stack Logic
-const activeStackIndex = ref(0);
-let stackInterval = null;
-
-const getStackCardStyle = (index) => {
-  const total = images.value.length;
-  if (total <= 2) return {};
-
-  const relIndex = (index - activeStackIndex.value + total) % total;
-  
-  let translateX = 0;
-  let translateY = 0;
-  let rotate = 0;
-  let scale = 1;
-  let zIndex = total - relIndex;
-  let opacity = 1;
-
-  if (relIndex === 0) {
-    translateX = 0; translateY = 0; rotate = -2; scale = 1.05;
-  } else if (relIndex === 1) {
-    translateX = 20; translateY = 15; rotate = 5; scale = 0.95;
-  } else if (relIndex === 2) {
-    translateX = -15; translateY = -10; rotate = -6; scale = 0.90;
-  } else if (relIndex === total - 1) {
-    translateX = -180; translateY = -40; rotate = -25; scale = 0.9;
-    zIndex = total + 1; 
-    opacity = 0; 
-  } else {
-    opacity = 0; scale = 0.8;
-  }
-
-  return {
-    zIndex,
-    transform: `translateX(${translateX}px) translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
-    opacity,
-  };
-};
-
-onMounted(() => {
-  if (props.slideData.layout === 'layout-reverse' && images.value.length > 2) {
-    stackInterval = setInterval(() => {
-      activeStackIndex.value = (activeStackIndex.value + 1) % images.value.length;
-    }, 2500);
-  }
-});
-
-onUnmounted(() => {
-  if (stackInterval) clearInterval(stackInterval);
 });
 </script>
 
@@ -213,161 +148,6 @@ onUnmounted(() => {
 .layout-full-image .title,
 .layout-full-image .message {
   text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-}
-
-.collage-container {
-  position: relative;
-  width: 100%;
-  max-width: 350px;
-  height: 380px;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.photo-container {
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-  border: 4px solid rgba(255,255,255,0.15);
-  background-color: var(--color-bg-panel);
-}
-
-.collage-item {
-  position: absolute;
-  width: 220px;
-  height: 300px;
-  transition: transform 0.3s ease;
-}
-
-/* Dynamic Stack Card */
-.stack-card {
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-}
-
-/* 1 Image Layout */
-.count-1 .item-1 {
-  position: relative;
-  width: 260px;
-  height: 340px;
-  transform: rotate(-2deg);
-  z-index: 2;
-}
-
-/* 2 Images Layout - Animated Swap */
-.count-2 .item-1 {
-  animation: card-swap-1 5s ease-in-out infinite;
-}
-.count-2 .item-2 {
-  animation: card-swap-2 5s ease-in-out infinite;
-}
-
-@keyframes card-swap-1 {
-  0%, 30% { transform: rotate(-6deg) translateX(-30px) translateY(-20px); z-index: 1; }
-  40% { transform: rotate(-15deg) translateX(-100px) translateY(-10px); z-index: 1; }
-  41% { transform: rotate(-15deg) translateX(-100px) translateY(-10px); z-index: 3; }
-  50%, 80% { transform: rotate(8deg) translateX(30px) translateY(20px); z-index: 3; }
-  90% { transform: rotate(15deg) translateX(100px) translateY(10px); z-index: 3; }
-  91% { transform: rotate(15deg) translateX(100px) translateY(10px); z-index: 1; }
-  100% { transform: rotate(-6deg) translateX(-30px) translateY(-20px); z-index: 1; }
-}
-
-@keyframes card-swap-2 {
-  0%, 30% { transform: rotate(8deg) translateX(30px) translateY(20px); z-index: 3; }
-  40% { transform: rotate(15deg) translateX(100px) translateY(10px); z-index: 3; }
-  41% { transform: rotate(15deg) translateX(100px) translateY(10px); z-index: 1; }
-  50%, 80% { transform: rotate(-6deg) translateX(-30px) translateY(-20px); z-index: 1; }
-  90% { transform: rotate(-15deg) translateX(-100px) translateY(-10px); z-index: 1; }
-  91% { transform: rotate(-15deg) translateX(-100px) translateY(-10px); z-index: 3; }
-  100% { transform: rotate(8deg) translateX(30px) translateY(20px); z-index: 3; }
-}
-
-/* 3 Images Grid Layout (Instagram Style) */
-.count-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 2fr 1fr;
-  gap: 8px;
-  width: 100%;
-  max-width: 350px;
-  height: 380px;
-  padding: 0;
-}
-
-.count-3 .collage-item {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform: none !important;
-  border-radius: 8px;
-  border: none;
-  box-shadow: none;
-}
-
-.count-3 .item-1 {
-  grid-column: 1 / -1;
-  grid-row: 1;
-}
-.count-3 .item-2 {
-  grid-column: 1;
-  grid-row: 2;
-}
-.count-3 .item-3 {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-/* 4 Images Grid Layout */
-.count-4 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8px;
-  width: 100%;
-  max-width: 350px;
-  height: 350px;
-  padding: 0;
-}
-
-.count-4 .collage-item {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform: none !important;
-  border-radius: 8px;
-  border: none;
-  box-shadow: none;
-}
-
-/* 6 Images Grid Layout */
-.count-6 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
-  gap: 8px;
-  width: 100%;
-  max-width: 350px;
-  height: 400px;
-  padding: 0;
-}
-
-.count-6 .collage-item {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform: none !important;
-  border-radius: 8px;
-  border: none;
-  box-shadow: none;
-}
-
-.slide-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 .emoji {
