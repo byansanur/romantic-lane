@@ -320,7 +320,7 @@ const downloadFallback = (canvas) => {
   width: 100%;
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -336,15 +336,14 @@ const downloadFallback = (canvas) => {
   display: flex;
   align-items: center;
   gap: 2rem;
-  height: 65vh; /* Fixed height for cards */
-  padding: 0 2rem;
+  padding: 1rem 2rem; /* Give padding to avoid shadow clipping */
   width: max-content; /* Critical for horizontal scrolling */
 }
 
 .share-card {
   position: relative;
   width: 300px; /* Fixed width */
-  height: 100%;
+  aspect-ratio: 9 / 16; /* Force exact portrait format for Instagram Story */
   background: #222;
   scroll-snap-align: center;
   flex-shrink: 0;
@@ -475,7 +474,7 @@ const downloadFallback = (canvas) => {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem 1rem;
   margin-top: auto;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem; /* Increased margin to prevent overlap with watermark */
 }
 
 .stats-grid.single-stat {
