@@ -60,7 +60,8 @@ const errorMessage = ref('');
 const userData = ref({
   name: 'Loading...',
   avatar: '',
-  isPremium: false
+  isPremium: false,
+  aiGenerateCount: 0
 });
 
 const projectList = ref([]);
@@ -71,12 +72,14 @@ onMounted(() => {
   
   let isPremium = false;
   let avatarUrl = currentUser?.photoURL || '';
+  let aiGenerateCount = 0;
 
   try {
     const cachedUserStr = localStorage.getItem('user_cache');
     if (cachedUserStr) {
       const cachedUser = JSON.parse(cachedUserStr);
       isPremium = !!cachedUser.is_premium;
+      aiGenerateCount = cachedUser.ai_generate_count || 0;
       
       // Jika avatar_url dari backend tidak kosong, gunakan itu. 
       // Jika kosong, akan fallback ke currentUser?.photoURL dari Firebase
@@ -92,7 +95,8 @@ onMounted(() => {
     userData.value = {
       name: currentUser.displayName || currentUser.email.split('@')[0],
       avatar: avatarUrl,
-      isPremium: isPremium
+      isPremium: isPremium,
+      aiGenerateCount: aiGenerateCount
     };
     
     // Fetch dynamic data from Golang Backend

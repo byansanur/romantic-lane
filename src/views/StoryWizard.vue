@@ -234,7 +234,7 @@ const auth = getAuth();
 
 // Layout State
 const isSidebarOpen = ref(false);
-const userData = ref({ name: 'Loading...', avatar: '', isPremium: false });
+const userData = ref({ name: 'Loading...', avatar: '', isPremium: false, aiGenerateCount: 0 });
 
 const modalConfig = reactive({
   isOpen: false,
@@ -259,12 +259,14 @@ onMounted(() => {
   const currentUser = auth.currentUser;
   let isPremium = false;
   let avatarUrl = currentUser?.photoURL || '';
+  let aiGenerateCount = 0;
 
   try {
     const cachedUserStr = localStorage.getItem('user_cache');
     if (cachedUserStr) {
       const cachedUser = JSON.parse(cachedUserStr);
       isPremium = !!cachedUser.is_premium;
+      aiGenerateCount = cachedUser.ai_generate_count || 0;
       if (cachedUser.avatar_url && cachedUser.avatar_url.trim() !== '') {
         avatarUrl = cachedUser.avatar_url;
       }
@@ -277,7 +279,8 @@ onMounted(() => {
     userData.value = {
       name: currentUser.displayName || currentUser.email.split('@')[0],
       avatar: avatarUrl,
-      isPremium: isPremium
+      isPremium: isPremium,
+      aiGenerateCount: aiGenerateCount
     };
   }
 });
@@ -361,6 +364,7 @@ const incrementAILimit = () => {
       const cachedUser = JSON.parse(cachedUserStr);
       cachedUser.ai_generate_count = (cachedUser.ai_generate_count || 0) + 1;
       localStorage.setItem('user_cache', JSON.stringify(cachedUser));
+      userData.value.aiGenerateCount = cachedUser.ai_generate_count;
     } catch(err) {
       console.error("Error updating user_cache", err);
     }

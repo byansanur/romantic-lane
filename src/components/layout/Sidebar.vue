@@ -38,6 +38,21 @@
         <span class="text-xs font-semibold bg-slate-800 px-2 py-1 rounded border border-slate-700">EN</span>
       </button>
     </nav>
+
+    <!-- Quota Indicator -->
+    <div class="px-4 mb-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Story Quota</span>
+          <span class="text-xs font-bold" :class="user?.aiGenerateCount >= 3 ? 'text-rose-500' : 'text-emerald-500'">
+            {{ user?.aiGenerateCount || 0 }} / 3
+          </span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5">
+          <div class="h-1.5 rounded-full transition-all duration-300" :class="user?.aiGenerateCount >= 3 ? 'bg-rose-500' : 'bg-emerald-500'" :style="{ width: `${Math.min(((user?.aiGenerateCount || 0) / 3) * 100, 100)}%` }"></div>
+        </div>
+      </div>
+    </div>
     
     <div class="p-4 border-t border-slate-800">
       <div class="flex items-center gap-3 mb-4">
@@ -68,7 +83,7 @@
 defineProps({
   user: {
     type: Object,
-    default: () => ({ name: '', avatar: '', isPremium: false })
+    default: () => ({ name: '', avatar: '', isPremium: false, aiGenerateCount: 0 })
   }
 });
 defineEmits(['logout', 'create-story', 'change-language']);
