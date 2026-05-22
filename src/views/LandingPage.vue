@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-slate-950 text-white overflow-x-hidden">
     
     <!-- Header -->
-    <TopHeader mode="landing" @login="login" @create-story="goToDashboard" />
+    <TopHeader mode="landing" @login="login" @create-story="login" />
 
     <!-- Hero Section -->
     <section id="hero" class="relative min-h-[90vh] flex items-center justify-center px-4 py-20 overflow-hidden">
@@ -256,17 +256,19 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { getAuth } from 'firebase/auth';
 import TopHeader from '../components/layout/TopHeader.vue';
 
 const router = useRouter();
 const cardFlipped = ref(false);
 
 const login = () => {
-  router.push('/login');
-};
-
-const goToDashboard = () => {
-  router.push('/dashboard');
+  const auth = getAuth();
+  if (auth.currentUser) {
+    router.push('/dashboard');
+  } else {
+    router.push('/login');
+  }
 };
 
 const scrollToDemo = () => {
