@@ -1,12 +1,7 @@
 <template>
-  <StoryViewer :slides="storySlides" />
+  <router-view />
 </template>
 
-<script setup>
-import StoryViewer from './components/StoryViewer.vue';
-import { storySlides } from './config/storyData';
-</script>
-
 <style>
-/* Any global resets not covered in style.css */
+/* Global resets handled in style.css */
 </style>

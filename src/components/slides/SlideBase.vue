@@ -36,7 +36,7 @@
       </div>
       
       <h1 class="title" v-if="slideData.title">{{ slideData.title }}</h1>
-      <p class="message" v-if="slideData.message" v-html="slideData.message"></p>
+      <p class="message" v-if="slideData.text || slideData.message" v-html="slideData.text || slideData.message"></p>
     </div>
   </div>
 </template>
@@ -54,8 +54,9 @@ const props = defineProps({
 });
 
 const images = computed(() => {
-  if (!props.slideData.image) return [];
-  return Array.isArray(props.slideData.image) ? props.slideData.image : [props.slideData.image];
+  const imgs = props.slideData.photos || props.slideData.image;
+  if (!imgs || (Array.isArray(imgs) && imgs.length === 0)) return [];
+  return Array.isArray(imgs) ? imgs : [imgs];
 });
 
 const slideStyle = computed(() => {

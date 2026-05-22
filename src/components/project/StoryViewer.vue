@@ -7,9 +7,22 @@
     @touchend="onPointerUp"
   >
     <div v-if="!hasStarted" class="intro-screen" @click.stop="startStory">
-       <div class="intro-content">
-         <h1>Ready to dive in?</h1>
-         <button class="start-btn">Start Journey</button>
+       <!-- Dynamic Background -->
+       <div 
+         v-if="coverSlide?.photos && coverSlide.photos.length > 0" 
+         class="absolute inset-0 bg-cover bg-center"
+         :style="{ backgroundImage: `url('${coverSlide.photos[0]}')` }"
+       ></div>
+       <div v-if="coverSlide?.photos && coverSlide.photos.length > 0" class="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]"></div>
+
+       <div class="intro-content animate-fade-up relative z-10">
+         <h1 v-if="coverSlide?.title" class="cover-title">{{ coverSlide.title }}</h1>
+         <h1 v-else>Ready to dive in?</h1>
+         
+         <h3 v-if="coverSlide?.subtitle" class="cover-subtitle">{{ coverSlide.subtitle }}</h3>
+         <p v-if="coverSlide?.text" class="cover-text">{{ coverSlide.text }}</p>
+         
+         <button class="start-btn mt-8">Start Journey</button>
        </div>
     </div>
 
@@ -24,14 +37,26 @@
     <!-- IG Style Music Watermark -->
     <MusicWatermark v-if="hasStarted && !isFinalShareSlide" :label="currentMusicLabel" />
     
-    <div class="story-content">
+    <div class="story-content" v-if="hasStarted">
       <Transition name="fade" mode="out-in">
-        <component 
-          :is="currentSlideComponent" 
-          :key="currentIndex" 
-          :slideData="slides[currentIndex]" 
-          @restart="restartStory"
-        />
+        <div :key="currentIndex" class="w-full h-full">
+          <SlidePolaroid 
+            v-if="storySlides[currentIndex]?.type === 'polaroid_text'" 
+            :slideData="storySlides[currentIndex]" 
+          />
+          
+          <SlideShare 
+            v-else-if="storySlides[currentIndex]?.type === 'slide-share'" 
+            :slideData="storySlides[currentIndex]" 
+            @restart="restartStory"
+          />
+          
+          <!-- Fallback Legacy Slide -->
+          <SlideBase 
+            v-else-if="storySlides[currentIndex]" 
+            :slideData="storySlides[currentIndex]" 
+          />
+        </div>
       </Transition>
     </div>
     
@@ -45,10 +70,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import StoryProgressBar from './StoryProgressBar.vue';
-import SlideBase from './slides/SlideBase.vue'; 
-import SlideShare from './slides/SlideShare.vue';
-import MusicWatermark from './ui/MusicWatermark.vue';
+import StoryProgressBar from '../ui/StoryProgressBar.vue';
+import SlideBase from '../slides/SlideBase.vue'; 
+import SlidePolaroid from '../slides/SlidePolaroid.vue';
+import SlideShare from '../slides/SlideShare.vue';
+import MusicWatermark from '../ui/MusicWatermark.vue';
 
 const props = defineProps({
   slides: {
@@ -62,8 +88,16 @@ const isPaused = ref(false);
 const pressTimer = ref(null);
 const isLongPress = ref(false);
 
+const coverSlide = computed(() => {
+  return props.slides.find(s => s.type === 'cover');
+});
+
+const storySlides = computed(() => {
+  return props.slides.filter(s => s.type !== 'cover');
+});
+
 const contentSlidesCount = computed(() => {
-  return props.slides.filter(s => s.type !== 'slide-share').length;
+  return storySlides.value.filter(s => s.type !== 'slide-share').length;
 });
 
 const hasStarted = ref(false);
@@ -74,6 +108,7 @@ const audioRef = ref(null);
  * Juga akan memicu audio slide pertama untuk diputar.
  */
 const startStory = () => {
+  if (storySlides.value.length === 0) return; // Prevent crash if no slides
   hasStarted.value = true;
   playAudioForCurrentSlide();
 };
@@ -84,7 +119,7 @@ const startStory = () => {
  */
 const playAudioForCurrentSlide = () => {
   if (!audioRef.value) return;
-  const slide = props.slides[currentIndex.value];
+  const slide = storySlides.value[currentIndex.value];
   if (slide && slide.audioSrc) {
     audioRef.value.src = slide.audioSrc;
     audioRef.value.play().catch(e => console.log('Audio play blocked:', e));
@@ -109,19 +144,14 @@ watch(isPaused, (newVal) => {
 });
 
 const isFinalShareSlide = computed(() => {
-  return props.slides[currentIndex.value]?.type === 'slide-share';
+  return storySlides.value[currentIndex.value]?.type === 'slide-share';
 });
 
 const currentMusicLabel = computed(() => {
-  return props.slides[currentIndex.value]?.musicLabel || '';
+  return storySlides.value[currentIndex.value]?.musicLabel || '';
 });
 
-const currentSlideComponent = computed(() => {
-  if (isFinalShareSlide.value) {
-    return SlideShare;
-  }
-  return SlideBase; 
-});
+
 
 /**
  * Memulai ulang keseluruhan cerita ke indeks slide 0.
@@ -137,7 +167,7 @@ const restartStory = () => {
 const nextSlide = () => {
   if (isLongPress.value) return; 
   if (isFinalShareSlide.value) return;
-  if (currentIndex.value < props.slides.length - 1) {
+  if (currentIndex.value < storySlides.value.length - 1) {
     currentIndex.value++;
   }
 };
@@ -225,7 +255,37 @@ const onPointerUp = () => {
   cursor: pointer;
 }
 
-.intro-content h1 {
+.intro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+.cover-title {
+  font-family: var(--font-heading, serif);
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary, #f43f5e);
+  line-height: 1.2;
+}
+
+.cover-subtitle {
+  font-size: 1.2rem;
+  color: #fda4af; /* rose-300 */
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.cover-text {
+  font-size: 1rem;
+  color: #cbd5e1; /* slate-300 */
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 80%;
+}
+
+.intro-content h1:not(.cover-title) {
   font-family: var(--font-heading);
   font-size: 2.5rem;
   margin-bottom: 2rem;

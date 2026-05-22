@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --color-primary: #E29595;
   --color-secondary: #B19CD9;
@@ -35,9 +39,6 @@ html, body {
 #app {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Container limits width on desktop to resemble a phone screen */
@@ -45,6 +46,7 @@ html, body {
   width: 100%;
   height: 100%;
   max-width: 450px; /* Mobile width constraint on desktop */
+  margin: 0 auto; /* Center horizontally */
   background-color: var(--color-bg-dark);
   position: relative;
   overflow: hidden;
