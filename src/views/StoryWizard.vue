@@ -202,9 +202,8 @@
         <button @click="finishAndGoDashboard" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg shadow-rose-500/20">
           Back to Dashboard
         </button>
-      </div>
     </div>
-    </div>
+
 
     <!-- Global Dialog Modal -->
     <DialogModal 
