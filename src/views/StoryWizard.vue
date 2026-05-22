@@ -204,6 +204,17 @@
         </button>
       </div>
     </div>
+    </div>
+
+    <!-- Global Dialog Modal -->
+    <DialogModal 
+      :isOpen="modalConfig.isOpen"
+      :type="modalConfig.type"
+      :title="modalConfig.title"
+      :message="modalConfig.message"
+      :primaryAction="modalConfig.primaryAction"
+      @close="modalConfig.isOpen = false"
+    />
   </div>
 </template>
 
@@ -214,6 +225,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopHeader from '../components/layout/TopHeader.vue';
 import StoryViewer from '../components/project/StoryViewer.vue';
+import DialogModal from '../components/ui/DialogModal.vue';
 import { generateStoryAI, uploadFile, createProject } from '../services/projectService';
 
 const router = useRouter();
@@ -222,6 +234,25 @@ const auth = getAuth();
 // Layout State
 const isSidebarOpen = ref(false);
 const userData = ref({ name: 'Loading...', avatar: '', isPremium: false });
+
+const modalConfig = reactive({
+  isOpen: false,
+  type: 'info',
+  title: '',
+  message: '',
+  primaryAction: {
+    text: 'OK',
+    handler: () => { modalConfig.isOpen = false; }
+  }
+});
+
+const showModal = (title, message, type = 'error') => {
+  modalConfig.title = title;
+  modalConfig.message = message;
+  modalConfig.type = type;
+  modalConfig.primaryAction = { text: 'OK', handler: () => { modalConfig.isOpen = false; } };
+  modalConfig.isOpen = true;
+};
 
 onMounted(() => {
   const currentUser = auth.currentUser;
@@ -271,10 +302,10 @@ const publicStoryUrl = computed(() => {
 const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(publicStoryUrl.value);
-    alert('Link cerita berhasil disalin ke clipboard!');
+    showModal('Berhasil', 'Link cerita berhasil disalin ke clipboard!', 'success');
   } catch (err) {
     console.error('Failed to copy link:', err);
-    alert('Gagal menyalin link. Silakan salin secara manual.');
+    showModal('Gagal', 'Gagal menyalin link. Silakan salin secara manual.', 'error');
   }
 };
 
@@ -341,13 +372,13 @@ const checkCooldown = () => {
 // [FASE 2: INJEKSI AI SLIDE (Tipe: Cover)]
 const generateAI = async () => {
   if (checkAILimit() >= 3) {
-    alert("Batas Maksimal Harian: Anda hanya dapat menggunakan fitur AI sebanyak 3 kali per hari. Silakan coba lagi besok!");
+    showModal('Batas Maksimal Harian', 'Anda hanya dapat menggunakan fitur AI sebanyak 3 kali per hari. Silakan coba lagi besok!', 'warning');
     return;
   }
 
   const cooldown = checkCooldown();
   if (cooldown > 0) {
-    alert(`Terlalu cepat! Harap tunggu ${cooldown} detik lagi sebelum menghasilkan cerita baru (batas 1 request per menit).`);
+    showModal('Terlalu Cepat', `Harap tunggu ${cooldown} detik lagi sebelum menghasilkan cerita baru (batas 1 request per menit).`, 'warning');
     return;
   }
 
@@ -374,9 +405,9 @@ const generateAI = async () => {
   } catch (error) {
     console.error("Generate AI Error:", error);
     if (error.response?.status === 400 && error.response.data?.message === "INVALID_PROMPT") {
-      alert("Maaf, kalimat yang Anda masukkan tidak pantas atau tidak relevan. Silakan perbaiki prompt Anda.");
+      showModal('Prompt Tidak Valid', 'Maaf, kalimat yang Anda masukkan tidak pantas atau tidak relevan. Silakan perbaiki prompt Anda.', 'error');
     } else {
-      alert("Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.");
+      showModal('Gagal Menghubungi AI', 'Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.', 'error');
     }
     isGenerating.value = false;
   }
@@ -448,7 +479,7 @@ const uploadPhoto = (index) => {
             storyData.slides[index].photos.push(fileUrl);
           } catch (error) {
             console.error("Upload Error:", error);
-            alert("Gagal mengunggah foto.");
+            showModal('Upload Gagal', 'Gagal mengunggah foto. Periksa koneksi Anda dan coba lagi.', 'error');
           }
         }, 'image/webp', 0.8);
       };
@@ -490,7 +521,7 @@ const publishStory = async () => {
     showSuccessModal.value = true;
   } catch (error) {
     console.error("Publish Error:", error);
-    alert("Gagal mem-publish cerita. Silakan coba lagi.");
+    showModal('Publish Gagal', 'Gagal mem-publish cerita. Silakan coba lagi.', 'error');
     isPublishing.value = false;
   }
 };

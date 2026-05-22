@@ -121,12 +121,22 @@
       </button>
     </div>
 
+    <!-- Global Dialog Modal -->
+    <DialogModal 
+      :isOpen="modalConfig.isOpen"
+      :type="modalConfig.type"
+      :title="modalConfig.title"
+      :message="modalConfig.message"
+      :primaryAction="modalConfig.primaryAction"
+      @close="modalConfig.isOpen = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import html2canvas from 'html2canvas';
+import DialogModal from '../ui/DialogModal.vue';
 
 import imgFirstMeet from '../../assets/image/first-meet.webp';
 import imgFirstDate from '../../assets/image/first-date1.webp';
@@ -164,6 +174,17 @@ const isGenerating = ref(false);
 const carouselRef = ref(null);
 const card1Ref = ref(null);
 const card2Ref = ref(null);
+
+const modalConfig = reactive({
+  isOpen: false,
+  type: 'error',
+  title: 'Error',
+  message: '',
+  primaryAction: {
+    text: 'OK',
+    handler: () => { modalConfig.isOpen = false; }
+  }
+});
 
 /**
  * Menangani event scroll pada carousel kartu share.
@@ -223,7 +244,10 @@ const shareSelectedCard = async () => {
   } catch (err) {
     console.error('Failed to generate image', err);
     isGenerating.value = false;
-    alert('Gagal membuat gambar. Silakan coba lagi.');
+    modalConfig.title = 'Gagal';
+    modalConfig.message = 'Gagal membuat gambar. Silakan coba lagi.';
+    modalConfig.type = 'error';
+    modalConfig.isOpen = true;
   }
 };
 

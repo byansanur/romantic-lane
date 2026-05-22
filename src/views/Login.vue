@@ -94,14 +94,25 @@
         </button>
       </p>
     </div>
+
+    <!-- Global Modal -->
+    <DialogModal 
+      :isOpen="modalConfig.isOpen"
+      :type="modalConfig.type"
+      :title="modalConfig.title"
+      :message="modalConfig.message"
+      :primaryAction="modalConfig.primaryAction"
+      @close="modalConfig.isOpen = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { syncUser } from '../services/modules/user';
+import DialogModal from '../components/ui/DialogModal.vue';
 
 const router = useRouter();
 const auth = getAuth();
@@ -110,6 +121,17 @@ const provider = new GoogleAuthProvider();
 const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
+
+const modalConfig = reactive({
+  isOpen: false,
+  type: 'error',
+  title: 'Error',
+  message: '',
+  primaryAction: {
+    text: 'OK',
+    handler: () => { modalConfig.isOpen = false; }
+  }
+});
 
 const handleEmailLogin = async () => {
   if (isLoading.value) return;
@@ -128,7 +150,10 @@ const handleEmailLogin = async () => {
     if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
         errorMessage = 'Email atau password salah.';
     }
-    alert(errorMessage);
+    modalConfig.title = 'Login Gagal';
+    modalConfig.message = errorMessage;
+    modalConfig.type = 'error';
+    modalConfig.isOpen = true;
   } finally {
     isLoading.value = false;
   }
@@ -147,7 +172,10 @@ const loginWithGoogle = async () => {
     router.push('/dashboard');
   } catch (error) {
     console.error('Login failed', error);
-    alert('Gagal melakukan login dengan Google. Silakan coba lagi.');
+    modalConfig.title = 'Google Login Gagal';
+    modalConfig.message = 'Gagal melakukan login dengan Google. Silakan coba lagi.';
+    modalConfig.type = 'error';
+    modalConfig.isOpen = true;
   } finally {
     isLoading.value = false;
   }
