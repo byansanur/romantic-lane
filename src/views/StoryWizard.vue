@@ -354,22 +354,15 @@ const checkAILimit = () => {
   return 0;
 };
 
-const incrementAILimit = async () => {
-  try {
-    // Sync user from database so ai_generate_count is fresh
-    const syncResponse = await syncUser();
-    if (syncResponse && syncResponse.data) {
-      localStorage.setItem('user_cache', JSON.stringify(syncResponse.data));
-    }
-  } catch (e) {
-    console.error("Failed to sync user data after generation, doing local fallback increment", e);
-    const cachedUserStr = localStorage.getItem('user_cache');
-    if (cachedUserStr) {
-      try {
-        const cachedUser = JSON.parse(cachedUserStr);
-        cachedUser.ai_generate_count = (cachedUser.ai_generate_count || 0) + 1;
-        localStorage.setItem('user_cache', JSON.stringify(cachedUser));
-      } catch(err) {}
+const incrementAILimit = () => {
+  const cachedUserStr = localStorage.getItem('user_cache');
+  if (cachedUserStr) {
+    try {
+      const cachedUser = JSON.parse(cachedUserStr);
+      cachedUser.ai_generate_count = (cachedUser.ai_generate_count || 0) + 1;
+      localStorage.setItem('user_cache', JSON.stringify(cachedUser));
+    } catch(err) {
+      console.error("Error updating user_cache", err);
     }
   }
   localStorage.setItem('last_ai_request_time', Date.now().toString());
@@ -417,7 +410,7 @@ const generateAI = async () => {
       }
     ];
     
-    await incrementAILimit();
+    incrementAILimit();
     isGenerating.value = false;
     currentStep.value = 2;
   } catch (error) {
