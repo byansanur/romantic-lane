@@ -420,10 +420,11 @@ const generateAI = async () => {
     currentStep.value = 2;
   } catch (error) {
     console.error("Generate AI Error:", error);
+    const errMsg = error.response?.data?.message || error.message || 'Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.';
     if (error.response?.status === 400 && error.response.data?.message === "INVALID_PROMPT") {
       showModal('Prompt Tidak Valid', 'Maaf, kalimat yang Anda masukkan tidak pantas atau tidak relevan. Silakan perbaiki prompt Anda.', 'error');
     } else {
-      showModal('Gagal Menghubungi AI', 'Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.', 'error');
+      showModal('Gagal Menghubungi AI', errMsg, 'error');
     }
     isGenerating.value = false;
   }
@@ -495,7 +496,8 @@ const uploadPhoto = (index) => {
             storyData.slides[index].photos.push(fileUrl);
           } catch (error) {
             console.error("Upload Error:", error);
-            showModal('Upload Gagal', 'Gagal mengunggah foto. Periksa koneksi Anda dan coba lagi.', 'error');
+            const errMsg = error.response?.data?.message || error.message || 'Gagal mengunggah foto. Periksa koneksi Anda dan coba lagi.';
+            showModal('Upload Gagal', errMsg, 'error');
           }
         }, 'image/webp', 0.8);
       };
@@ -537,7 +539,8 @@ const publishStory = async () => {
     showSuccessModal.value = true;
   } catch (error) {
     console.error("Publish Error:", error);
-    showModal('Publish Gagal', 'Gagal mem-publish cerita. Silakan coba lagi.', 'error');
+    const errMsg = error.response?.data?.message || error.message || 'Gagal mem-publish cerita. Silakan coba lagi.';
+    showModal('Publish Gagal', errMsg, 'error');
     isPublishing.value = false;
   }
 };
