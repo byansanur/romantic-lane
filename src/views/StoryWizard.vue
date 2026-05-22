@@ -226,6 +226,7 @@ import TopHeader from '../components/layout/TopHeader.vue';
 import StoryViewer from '../components/project/StoryViewer.vue';
 import DialogModal from '../components/ui/DialogModal.vue';
 import { generateStoryAI, uploadFile, createProject } from '../services/projectService';
+import { syncUser } from '../services/modules/user';
 
 const router = useRouter();
 const auth = getAuth();
@@ -339,20 +340,36 @@ const storyData = reactive({
 
 // Helper for AI Limit
 const checkAILimit = () => {
-  const today = new Date().toISOString().split('T')[0];
-  const usageDate = localStorage.getItem('ai_usage_date');
-  let usageCount = parseInt(localStorage.getItem('ai_usage_count') || '0', 10);
-  
-  if (usageDate !== today) {
-    usageCount = 0;
-    localStorage.setItem('ai_usage_date', today);
+  try {
+    const cachedUserStr = localStorage.getItem('user_cache');
+    if (cachedUserStr) {
+      const cachedUser = JSON.parse(cachedUserStr);
+      return cachedUser.ai_generate_count || 0;
+    }
+  } catch (e) {
+    console.error("Error reading user_cache for AI limit", e);
   }
-  return usageCount;
+  return 0;
 };
 
-const incrementAILimit = () => {
-  const usageCount = checkAILimit();
-  localStorage.setItem('ai_usage_count', (usageCount + 1).toString());
+const incrementAILimit = async () => {
+  try {
+    // Sync user from database so ai_generate_count is fresh
+    const syncResponse = await syncUser();
+    if (syncResponse && syncResponse.data) {
+      localStorage.setItem('user_cache', JSON.stringify(syncResponse.data));
+    }
+  } catch (e) {
+    console.error("Failed to sync user data after generation, doing local fallback increment", e);
+    const cachedUserStr = localStorage.getItem('user_cache');
+    if (cachedUserStr) {
+      try {
+        const cachedUser = JSON.parse(cachedUserStr);
+        cachedUser.ai_generate_count = (cachedUser.ai_generate_count || 0) + 1;
+        localStorage.setItem('user_cache', JSON.stringify(cachedUser));
+      } catch(err) {}
+    }
+  }
   localStorage.setItem('last_ai_request_time', Date.now().toString());
 };
 
@@ -398,7 +415,7 @@ const generateAI = async () => {
       }
     ];
     
-    incrementAILimit();
+    await incrementAILimit();
     isGenerating.value = false;
     currentStep.value = 2;
   } catch (error) {
