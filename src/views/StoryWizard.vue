@@ -66,8 +66,9 @@
             <label class="block text-sm font-medium text-slate-300 mb-2">Memory / Prompt for AI</label>
             <textarea v-model="storyData.prompt" rows="4" placeholder="Tell the AI what happened... e.g. We went to the beach and saw a beautiful sunset." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-colors resize-none"></textarea>
           </div>
-          <button @click="generateAI" :disabled="isGenerating || !storyData.title" class="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+          <button @click="generateAI" :disabled="isGenerating || !storyData.title || countdownTimer > 0" class="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
             <span v-if="isGenerating" class="animate-pulse">Generating Magic...</span>
+            <span v-else-if="countdownTimer > 0">Tunggu {{ countdownTimer }} detik...</span>
             <span v-else>Generate Initial Story</span>
           </button>
         </div>
@@ -290,6 +291,7 @@ const currentStep = ref(1);
 const stepTitles = ['Story Brainstorming', 'Edit & Add Media', 'Publish'];
 
 const isGenerating = ref(false);
+const countdownTimer = ref(0);
 const isPublishing = ref(false);
 const showSuccessModal = ref(false);
 const publishedSlug = ref('');
@@ -420,12 +422,26 @@ const generateAI = async () => {
     currentStep.value = 2;
   } catch (error) {
     console.error("Generate AI Error:", error);
-    const errMsg = error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.';
-    if (error.response?.status === 400 && (error.response.data?.error?.code === "INVALID_PROMPT" || error.response.data?.code === "INVALID_PROMPT")) {
-      showModal('Prompt Tidak Valid', errMsg, 'error');
+    
+    if (error.response?.status === 429) {
+      const errMsg = error.response?.data?.error?.message || error.response?.data?.message || 'Terlalu banyak permintaan. Silakan tunggu beberapa saat.';
+      showModal('Terlalu Banyak Permintaan', errMsg, 'warning');
+      countdownTimer.value = 90;
+      const interval = setInterval(() => {
+        countdownTimer.value--;
+        if (countdownTimer.value <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
     } else {
-      showModal('Gagal Menghubungi AI', errMsg, 'error');
+      const errMsg = error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Gagal menghubungi AI. Pastikan server berjalan dan coba lagi.';
+      if (error.response?.status === 400 && (error.response.data?.error?.code === "INVALID_PROMPT" || error.response.data?.code === "INVALID_PROMPT")) {
+        showModal('Prompt Tidak Valid', errMsg, 'error');
+      } else {
+        showModal('Gagal Menghubungi AI', errMsg, 'error');
+      }
     }
+    
     isGenerating.value = false;
   }
 };
