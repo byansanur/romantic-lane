@@ -255,27 +255,14 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useRouter } from 'vue-router';
-import { syncUser } from '../services/modules/user';
 import TopHeader from '../components/layout/TopHeader.vue';
 
 const router = useRouter();
-const auth = getAuth();
-const provider = new GoogleAuthProvider();
 const cardFlipped = ref(false);
 
-const login = async () => {
-  try {
-    await signInWithPopup(auth, provider);
-    const syncResponse = await syncUser();
-    if (syncResponse && syncResponse.data) {
-      localStorage.setItem('user_cache', JSON.stringify(syncResponse.data));
-    }
-    router.push('/dashboard');
-  } catch (error) {
-    console.error('Login failed', error);
-  }
+const login = () => {
+  router.push('/login');
 };
 
 const goToDashboard = () => {
