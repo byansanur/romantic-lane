@@ -6,9 +6,10 @@
       <div class="flex items-center gap-8">
         <h1 class="text-xl font-bold text-rose-500">Romantic Lane</h1>
         <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-          <a href="#" class="hover:text-rose-400 transition-colors">Home</a>
-          <a href="#" class="hover:text-rose-400 transition-colors">About</a>
-          <a href="#" class="hover:text-rose-400 transition-colors">Pricing</a>
+          <a href="#hero" @click.prevent="scrollTo('hero')" class="hover:text-rose-400 transition-colors">Home</a>
+          <a href="#features" @click.prevent="scrollTo('features')" class="hover:text-rose-400 transition-colors">Features</a>
+          <a href="#how-it-works" @click.prevent="scrollTo('how-it-works')" class="hover:text-rose-400 transition-colors">How It Works</a>
+          <a href="#pricing" @click.prevent="scrollTo('pricing')" class="hover:text-rose-400 transition-colors">Pricing</a>
         </nav>
       </div>
       <div class="flex items-center gap-4">
@@ -61,4 +62,8 @@ defineProps({
 });
 
 defineEmits(['login', 'create-story', 'search', 'toggle-sidebar']);
+
+const scrollTo = (id) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
 </script>
